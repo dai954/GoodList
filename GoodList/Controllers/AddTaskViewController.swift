@@ -6,8 +6,14 @@
 //
 
 import UIKit
+import RxSwift
 
 class AddTaskViewController: UIViewController {
+    
+    private let taskSubject = PublishSubject<Task>()
+    var taskSubjectObservable: Observable<Task> {
+        return taskSubject.asObservable()
+    }
     
     let prioritySegmentedControl: UISegmentedControl = {
         let items = ["High", "Midium", "Low"]
@@ -49,13 +55,11 @@ class AddTaskViewController: UIViewController {
     }
     
     @objc private func saveButtonPressed() {
-        print("saveButtonPressed")
-        
         guard let priority = Priority(rawValue: self.prioritySegmentedControl.selectedSegmentIndex),
               let title = taskTitletextField.text else { return }
         
         let task = Task(title: title, priority: priority)
-        
-//        self.navigationController?.popViewController(animated: true)
+        taskSubject.onNext(task)
+        self.navigationController?.popViewController(animated: true)
     }
 }
